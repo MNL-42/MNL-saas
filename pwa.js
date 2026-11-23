@@ -11,7 +11,7 @@
 
   /* Chrome / Edge / Android proposent l'installation via cet événement */
   window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); pwa.prompt = e; refreshSettings(); });
-  window.addEventListener('appinstalled', () => { pwa.prompt = null; if (N.toast) N.toast('MNL est installée sur ton appareil', { icon: 'check' }); refreshSettings(); });
+  window.addEventListener('appinstalled', () => { pwa.prompt = null; if (N.toast) N.toast('NACRE est installée sur ton appareil', { icon: 'check' }); refreshSettings(); });
 
   N.acts['pwa-install'] = async () => {
     const p = pwa.prompt; if (!p) return;
