@@ -1,0 +1,67 @@
+/* theme.css · la couleur d'accent est une vraie propriété animable.
+   JS : root.style.setProperty('--acc', theme.acc)  → tout le tableau de bord glisse vers la nouvelle teinte. */
+
+@property --acc     { syntax: '<color>'; inherits: true; initial-value: #1aa58a; }
+@property --acc2    { syntax: '<color>'; inherits: true; initial-value: #58d0b4; }
+@property --accsoft { syntax: '<color>'; inherits: true; initial-value: rgba(26, 165, 138, .14); }
+
+:root {
+  --e: cubic-bezier(.2, .8, .2, 1);
+
+  /* accent (Émeraude par défaut) */
+  --acc: #1aa58a;
+  --acc2: #58d0b4;
+  --accsoft: rgba(26, 165, 138, .14);
+  transition: --acc .9s var(--e), --acc2 .9s var(--e), --accsoft .9s var(--e);
+
+  /* encres */
+  --ink: #1b1612;
+  --ink-2: #5f554c;
+  --ink-3: #85796d;
+  --night: #17120e;
+
+  /* sémantique (indépendante de l'accent) */
+  --pos: #1b9a6a;
+  --pos-soft: rgba(27, 154, 106, .13);
+  --neg: #df4f3a;
+  --neg-soft: rgba(223, 79, 58, .12);
+  --warm: #ee6a3e;               /* épargne : anneaux et barre du mois */
+
+  /* verre */
+  --glass-a: #fffdfa9e;
+  --glass-b: #fff6ec5c;
+  --glass-line: rgba(255, 255, 255, .55);
+  --tile-a: rgba(255, 255, 255, .80);
+  --tile-b: rgba(255, 250, 243, .56);
+  --tile-line: rgba(255, 255, 255, .85);
+  --blur: 34px;
+
+  /* palette de catégories (par rang) */
+  --c1: #1fb08f;
+  --c2: #ef7a4d;
+  --c3: #f2c14e;
+  --c4: #231d18;
+  --c5: #5b7cf0;
+  --c6: #a78bfa;
+}
+
+/* « Verre plus clair » */
+html.glass-light {
+  --glass-a: #fffffff2;
+  --glass-b: #fffaf2c4;
+  --glass-line: rgba(255, 255, 255, .9);
+  --tile-a: rgba(255, 255, 255, .96);
+  --tile-b: rgba(255, 252, 247, .78);
+  --blur: 40px;
+}
+
+/* « Animations » désactivées */
+html.no-anim *, html.no-anim *::before, html.no-anim *::after {
+  animation-duration: .001ms !important;
+  animation-delay: 0s !important;
+  transition-duration: .001ms !important;
+  transition-delay: 0s !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}

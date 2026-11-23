@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>NACRE</title>
+  <meta name="description" content="NACRE · ton tableau de bord financier en verre dépoli.">
+  <meta name="theme-color" content="#17120e">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%231aa58a'/%3E%3Cpath d='M32 13s-12 13-12 21a12 12 0 0 0 24 0c0-8-12-21-12-21z' fill='none' stroke='white' stroke-width='4' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="bg" aria-hidden="true"></div>
+
+  <main id="auth" hidden></main>
+  <main id="setup" hidden></main>
+
+  <div id="stage" hidden>
+    <div id="panel">
+      <header class="topbar glass">
+        <div class="who"><span class="avatar" id="avatar" aria-hidden="true"></span><span class="hello">Bienvenue, <b id="whoName"></b></span></div>
+        <div class="cmd" id="cmd" role="search">
+          <span class="orb" aria-hidden="true"></span>
+          <input id="cmdIn" type="text" placeholder="Demande à NACRE…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Assistant NACRE : écris une commande, par exemple « Envoie 250 € à Clara »">
+          <kbd id="kbd"></kbd>
+          <div class="pal" id="pal" hidden role="listbox"></div>
+        </div>
+        <div class="tb-r">
+          <button type="button" class="round" data-act="bell" aria-label="Notifications"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><i id="bellDot" hidden></i></button>
+          <button type="button" class="round dark" data-act="focus-cmd" aria-label="Rechercher"><svg class="ic" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg></button>
+        </div>
+        <div class="pop glass" id="bellPop" hidden></div>
+      </header>
+
+      <nav class="rail glass" id="rail" aria-label="Navigation"></nav>
+
+      <main class="page glass" id="page">
+        <div id="view" tabindex="-1"></div>
+      </main>
+
+      <nav class="dock glass" id="dock" aria-label="Onglets"></nav>
+      <div class="quick glass" id="quick" hidden></div>
+    </div>
+  </div>
+
+  <div id="modals"></div>
+  <div id="toasts" aria-live="polite"></div>
+
+  <script src="config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js" crossorigin="anonymous"></script>
+  <script>window.supabase || document.write('<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js" crossorigin="anonymous"><\/script>')</script>
+  <script src="ui.js"></script>
+  <script src="data.js"></script>
+  <script src="reports.js"></script>
+  <script src="cards.js"></script>
+  <script src="palette.js"></script>
+  <script src="forms.js"></script>
+  <script src="views.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
