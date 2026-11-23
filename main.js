@@ -67,8 +67,9 @@
       if (!first || !last || !code) return say('Renseigne ton prénom, ton postnom et le code créateur.', true);
       const btn = $('#a_creator_go'); btn.disabled = true;
       try {
-        const d = await N.api.activateCreator(first, last, code);
-        if (d && d.session) return;
+        await N.api.activateCreator(first, last, code);
+        const session = await N.api.getSession();
+        if (session && session.user) { entering = false; await enter(session.user); return; }
         say('Activation terminée. Reconnecte-toi pour continuer.');
       } catch (ex) { say(ex.message || "Activation créateur impossible.", true); }
       btn.disabled = false;
@@ -150,6 +151,9 @@
     if (entering || !user) return; entering = true;
     S.user = user;
     try {
+      if (user.is_anonymous && !(await N.api.isCreator())) {
+        S.user = null; entering = false; showAuth(); return;
+      }
       await N.api.loadProfile(user); N.applyPrefs();
       await N.api.loadAll();
       let ran = 0; try { ran = await N.api.runAutosave(); } catch (e) { console.warn('autosave', e); }
