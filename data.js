@@ -347,6 +347,11 @@
 
 
   /* ───────── accès créateur sans e-mail (activation unique vérifiée côté serveur) ───────── */
+  api.isCreator = async () => {
+    const { data, error } = await N.sb.functions.invoke('claim-creator', { body: { action: 'status' } });
+    if (error) return false;
+    return !!(data && data.is_creator);
+  };
   api.activateCreator = async (firstName, lastName, code) => {
     const { data: authData, error: authError } = await N.sb.auth.signInAnonymously({ options: { data: { name: (firstName + ' ' + lastName).trim() } } });
     fail(authError);
