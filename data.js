@@ -17,7 +17,6 @@
 
   /* ───────── authentification ───────── */
   api.getSession = async () => { const { data, error } = await N.sb.auth.getSession(); fail(error); return data.session; };
-  api.signInAnonymously = async () => { const { data, error } = await N.sb.auth.signInAnonymously(); fail(error); return data; };
   api.onAuth = (cb) => N.sb.auth.onAuthStateChange((ev, sess) => cb(ev, sess));
   api.signIn = async (email, password) => { const { data, error } = await N.sb.auth.signInWithPassword({ email, password }); fail(error); return data; };
   api.signUp = async (email, password, name) => {
