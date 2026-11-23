@@ -132,17 +132,9 @@
     if (entering || !user) return; entering = true;
     S.user = user;
     try {
-      let ran = 0;
-      if (user.preview) {
-        S.profile = { display_name: 'Aperçu', currency: 'USD', language: 'fr-FR', timezone: 'Africa/Kinshasa', accent: 'emeraude', animations: true };
-        S.accounts = []; S.cards = []; S.goals = []; S.beneficiaries = []; S.tx = [];
-        S.accIdx = {}; S.cardIdx = {}; S.goalIdx = {};
-        N.applyPrefs();
-      } else {
-        await N.api.loadProfile(user); N.applyPrefs();
-        await N.api.loadAll();
-        try { ran = await N.api.runAutosave(); } catch (e) { console.warn('autosave', e); }
-      }
+      await N.api.loadProfile(user); N.applyPrefs();
+      await N.api.loadAll();
+      let ran = 0; try { ran = await N.api.runAutosave(); } catch (e) { console.warn('autosave', e); }
       buildShell();
       const h = (location.hash || '').replace('#', ''); S.view = N.views[h] ? h : 'overview';
       showOnly('#stage');
@@ -182,8 +174,17 @@
     document.documentElement.classList.add('ready');
     if (N.libMissing) return showSetup('lib');
     if (!N.configured) return showSetup('cfg');
-    /* Aperçu temporaire : ouvre la coque sans authentification ni chargement Supabase. */
-    enter({ id: 'preview', email: 'Aperçu', preview: true });
+    N.api.onAuth((ev, sess) => {
+      /* ne jamais appeler Supabase directement ici : on sort du callback d'abord */
+      if (ev === 'PASSWORD_RECOVERY') setTimeout(recovery, 0);
+      else if (ev === 'SIGNED_OUT') setTimeout(() => { entering = false; showAuth(); }, 0);
+      else if ((ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') && sess && sess.user && (!S.user || S.user.id !== sess.user.id || !shellBuilt)) setTimeout(() => enter(sess.user), 0);
+    });
+    try {
+      const sess = await N.api.getSession();
+      if (!sess) showAuth();
+      else if (!S.user && !entering) setTimeout(() => enter(sess.user), 0);
+    } catch (ex) { showFatal(ex); }
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
 })();
