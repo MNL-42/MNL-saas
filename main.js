@@ -27,6 +27,12 @@
       <form id="authForm" novalidate><div class="auth-tabs" role="tablist"><button type="button" class="on" data-mode="in">Se connecter</button><button type="button" data-mode="up">Créer un compte</button></div>
         <div class="fld up-only" hidden><label for="a_name">Prénom</label><input id="a_name" autocomplete="given-name" maxlength="40" placeholder="Andromis"></div>
         <div class="fld"><label for="a_mail">E-mail</label><input id="a_mail" type="email" autocomplete="email" required placeholder="toi@exemple.com"></div>
+        <div class="creator-entry"><button type="button" class="link" id="a_creator_toggle">Accès créateur sans e-mail</button><div id="a_creator_box" hidden>
+          <div class="fld"><label for="c_first">Prénom</label><input id="c_first" maxlength="40" autocomplete="given-name" placeholder="Prénom"></div>
+          <div class="fld"><label for="c_last">Postnom</label><input id="c_last" maxlength="60" autocomplete="family-name" placeholder="Postnom"></div>
+          <div class="fld"><label for="c_code">Code créateur</label><input id="c_code" type="password" autocomplete="off" placeholder="Code secret"></div>
+          <button type="button" class="btn dark lg" id="a_creator_go">Activer mon accès</button>
+        </div></div>
         <div class="fld"><label for="a_pw">Mot de passe</label><input id="a_pw" type="password" autocomplete="current-password" required minlength="8" placeholder="8 caractères minimum"></div>
         <button type="submit" class="btn dark lg" id="a_go">Se connecter</button>
         <button type="button" class="link" id="a_forgot">Mot de passe oublié ?</button>
@@ -53,6 +59,18 @@
           else say('Compte créé. Ouvre le mail de confirmation que Supabase vient de t\'envoyer, puis reviens te connecter.');
         } else await N.api.signIn(email, pw);
       } catch (ex) { say(/invalid login/i.test(ex.message) ? 'E-mail ou mot de passe incorrect.' : /not confirmed/i.test(ex.message) ? 'Confirme d\'abord ton e-mail (lien reçu par mail).' : ex.message, true); }
+      btn.disabled = false;
+    });
+    $('#a_creator_toggle').addEventListener('click', () => { $('#a_creator_box').hidden = !$('#a_creator_box').hidden; });
+    $('#a_creator_go').addEventListener('click', async () => {
+      const first = $('#c_first').value.trim(), last = $('#c_last').value.trim(), code = $('#c_code').value;
+      if (!first || !last || !code) return say('Renseigne ton prénom, ton postnom et le code créateur.', true);
+      const btn = $('#a_creator_go'); btn.disabled = true;
+      try {
+        const d = await N.api.activateCreator(first, last, code);
+        if (d && d.session) return;
+        say('Activation terminée. Reconnecte-toi pour continuer.');
+      } catch (ex) { say(ex.message || "Activation créateur impossible.", true); }
       btn.disabled = false;
     });
     $('#a_forgot').addEventListener('click', async () => {
