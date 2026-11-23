@@ -177,12 +177,12 @@
     N.api.onAuth((ev, sess) => {
       /* ne jamais appeler Supabase directement ici : on sort du callback d'abord */
       if (ev === 'PASSWORD_RECOVERY') setTimeout(recovery, 0);
-      else if (ev === 'SIGNED_OUT') setTimeout(() => { entering = false; showAuth(); }, 0);
+      else if (ev === 'SIGNED_OUT') setTimeout(async () => { entering = false; try { await N.api.signInAnonymously(); } catch (ex) { showFatal(ex); } }, 0);
       else if ((ev === 'SIGNED_IN' || ev === 'INITIAL_SESSION') && sess && sess.user && (!S.user || S.user.id !== sess.user.id || !shellBuilt)) setTimeout(() => enter(sess.user), 0);
     });
     try {
       const sess = await N.api.getSession();
-      if (!sess) showAuth();
+      if (!sess) await N.api.signInAnonymously();
       else if (!S.user && !entering) setTimeout(() => enter(sess.user), 0);
     } catch (ex) { showFatal(ex); }
   }
