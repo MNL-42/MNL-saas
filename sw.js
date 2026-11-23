@@ -4,7 +4,7 @@
    - Tes DONNÉES (Supabase : comptes, opérations, session) ne sont JAMAIS mises en cache ici :
      ce worker ne touche pas à ces requêtes, elles partent directement vers ta base.
    Pour forcer tous les appareils à repartir de zéro après une grosse modification, change VERSION. */
-const VERSION = 'mnl-v2';
+const VERSION = 'mnl-v3';
 const SHELL = VERSION + '-shell';
 const FILES = [
   './', 'index.html', 'style.css', 'theme.css', 'config.js', 'ui.js', 'data.js', 'reports.js', 'cards.js',
