@@ -4,12 +4,12 @@
    - Tes DONNÉES (Supabase : comptes, opérations, session) ne sont JAMAIS mises en cache ici :
      ce worker ne touche pas à ces requêtes, elles partent directement vers ta base.
    Pour forcer tous les appareils à repartir de zéro après une grosse modification, change VERSION. */
-const VERSION = 'mnl-v1';
+const VERSION = 'mnl-v2';
 const SHELL = VERSION + '-shell';
 const FILES = [
   './', 'index.html', 'style.css', 'theme.css', 'config.js', 'ui.js', 'data.js', 'reports.js', 'cards.js',
   'palette.js', 'forms.js', 'views.js', 'main.js', 'pwa.js', 'bg.jpg', 'manifest.webmanifest',
-  'icon-192.png', 'icon-512.png', 'apple-touch-icon.png'
+  'icon-192.svg', 'icon-512.svg'
 ];
 /* seuls ces domaines « de bibliothèque » sont mis en cache (bibliothèque Supabase et polices) */
 const LIBS = ['cdn.jsdelivr.net', 'unpkg.com', 'fonts.googleapis.com', 'fonts.gstatic.com'];
