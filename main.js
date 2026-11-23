@@ -20,63 +20,33 @@
   }
 
   function showAuth(msg) {
-    S.user = null; S.profile = null; shellBuilt = shellBuilt && false;
+    S.user = null; S.profile = null; shellBuilt = false;
     N.applyTheme('emeraude'); document.documentElement.classList.remove('glass-light', 'no-anim');
     const box = $('#auth');
     box.innerHTML = `<div class="auth-card glass"><div class="logo-big">${N.icon('drop', 30)}</div><h1>NACRE</h1><p class="tagline">Créé par MNL</p>
-      <form id="authForm" novalidate><div class="auth-tabs" role="tablist"><button type="button" class="on" data-mode="in">Se connecter</button><button type="button" data-mode="up">Créer un compte</button></div>
-        <div class="fld up-only" hidden><label for="a_name">Prénom</label><input id="a_name" autocomplete="given-name" maxlength="40" placeholder="Andromis"></div>
-        <div class="fld"><label for="a_mail">E-mail</label><input id="a_mail" type="email" autocomplete="email" required placeholder="toi@exemple.com"></div>
-        <div class="creator-entry"><button type="button" class="link" id="a_creator_toggle">Accès créateur sans e-mail</button><div id="a_creator_box" hidden>
-          <div class="fld"><label for="c_first">Prénom</label><input id="c_first" maxlength="40" autocomplete="given-name" placeholder="Prénom"></div>
-          <div class="fld"><label for="c_last">Postnom</label><input id="c_last" maxlength="60" autocomplete="family-name" placeholder="Postnom"></div>
-          <div class="fld"><label for="c_code">Code créateur</label><input id="c_code" type="password" autocomplete="off" placeholder="Code secret"></div>
-          <button type="button" class="btn dark lg" id="a_creator_go">Activer mon accès</button>
-        </div></div>
-        <div class="fld"><label for="a_pw">Mot de passe</label><input id="a_pw" type="password" autocomplete="current-password" required minlength="8" placeholder="8 caractères minimum"></div>
-        <button type="submit" class="btn dark lg" id="a_go">Se connecter</button>
-        <button type="button" class="link" id="a_forgot">Mot de passe oublié ?</button>
-        <p class="auth-msg ${msg ? 'show' : ''}" id="a_msg" role="alert">${N.esc(msg || '')}</p></form></div>`;
+      <form id="authForm" novalidate>
+        <div class="fld"><label for="a_last">Nom</label><input id="a_last" autocomplete="family-name" maxlength="60" required placeholder="Ton nom"></div>
+        <div class="fld"><label for="a_post">Post-nom</label><input id="a_post" autocomplete="additional-name" maxlength="60" required placeholder="Ton post-nom"></div>
+        <div class="fld"><label for="a_first">Prénom</label><input id="a_first" autocomplete="given-name" maxlength="40" required placeholder="Ton prénom"></div>
+        <button type="submit" class="btn dark lg" id="a_go">Créer mon espace</button>
+        <p class="auth-msg ${msg ? 'show' : ''}" id="a_msg" role="alert">${N.esc(msg || '')}</p>
+      </form></div>`;
     showOnly('#auth'); authIn(box.firstElementChild);
-    let mode = 'in';
-    const form = $('#authForm'), say = (t, err) => { const m = $('#a_msg'); m.textContent = t; m.className = 'auth-msg show' + (err ? ' err' : ''); };
-    form.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', () => {
-      mode = b.dataset.mode; form.querySelectorAll('[data-mode]').forEach((x) => x.classList.toggle('on', x === b));
-      $('.up-only', form).hidden = mode !== 'up'; $('#a_go').textContent = mode === 'up' ? 'Créer mon compte' : 'Se connecter';
-      $('#a_forgot').hidden = mode === 'up'; $('#a_pw').autocomplete = mode === 'up' ? 'new-password' : 'current-password';
-    }));
+    const form = $('#authForm');
+    const say = (t, err) => { const m = $('#a_msg'); m.textContent = t; m.className = 'auth-msg show' + (err ? ' err' : ''); };
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = $('#a_mail').value.trim(), pw = $('#a_pw').value, name = $('#a_name').value.trim();
-      if (!email || !/.+@.+\..+/.test(email)) return say('Entre une adresse e-mail valide.', true);
-      if (pw.length < 8) return say('Le mot de passe doit faire au moins 8 caractères.', true);
-      const btn = $('#a_go'); btn.disabled = true;
+      const last = $('#a_last').value.trim(), post = $('#a_post').value.trim(), first = $('#a_first').value.trim();
+      if (!last || !post || !first) return say('Complète les trois champs pour continuer.', true);
+      const btn = $('#a_go'); btn.disabled = true; btn.textContent = 'Création de ton espace…';
       try {
-        if (mode === 'up') {
-          const d = await N.api.signUp(email, pw, name);
-          if (d.session) return; /* e-mail déjà confirmé automatiquement : onAuth prend le relais */
-          if (d.user && d.user.identities && d.user.identities.length === 0) say('Un compte existe déjà avec cet e-mail. Connecte-toi.', true);
-          else say('Compte créé. Ouvre le mail de confirmation que Supabase vient de t\'envoyer, puis reviens te connecter.');
-        } else await N.api.signIn(email, pw);
-      } catch (ex) { say(/invalid login/i.test(ex.message) ? 'E-mail ou mot de passe incorrect.' : /not confirmed/i.test(ex.message) ? 'Confirme d\'abord ton e-mail (lien reçu par mail).' : ex.message, true); }
-      btn.disabled = false;
-    });
-    $('#a_creator_toggle').addEventListener('click', () => { $('#a_creator_box').hidden = !$('#a_creator_box').hidden; });
-    $('#a_creator_go').addEventListener('click', async () => {
-      const first = $('#c_first').value.trim(), last = $('#c_last').value.trim(), code = $('#c_code').value;
-      if (!first || !last || !code) return say('Renseigne ton prénom, ton postnom et le code créateur.', true);
-      const btn = $('#a_creator_go'); btn.disabled = true;
-      try {
-        await N.api.activateCreator(first, last, code);
-        const session = await N.api.getSession();
-        if (session && session.user) { entering = false; await enter(session.user); return; }
-        say('Activation terminée. Reconnecte-toi pour continuer.');
-      } catch (ex) { say(ex.message || "Activation créateur impossible.", true); }
-      btn.disabled = false;
-    });
-    $('#a_forgot').addEventListener('click', async () => {
-      const email = $('#a_mail').value.trim(); if (!email) return say('Entre ton e-mail ci-dessus, puis clique à nouveau.', true);
-      try { await N.api.resetPassword(email); say('Un lien de réinitialisation vient de t\'être envoyé.'); } catch (ex) { say(ex.message, true); }
+        await N.api.signInAnonymous({ first_name: first, post_name: post, last_name: last });
+      } catch (ex) {
+        say(/anonymous.*disabled|anonymous sign.?ins.*disabled/i.test(ex.message || '')
+          ? 'Active les connexions anonymes dans Supabase : Authentication → Sign In / Providers → Anonymous Sign-Ins.'
+          : (ex.message || 'Impossible de créer ton espace. Vérifie ta connexion.'), true);
+        btn.disabled = false; btn.textContent = 'Créer mon espace';
+      }
     });
   }
 
