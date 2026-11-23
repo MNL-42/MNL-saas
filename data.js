@@ -347,20 +347,16 @@
 
 
   /* ───────── accès créateur sans e-mail (activation unique vérifiée côté serveur) ───────── */
-  api.isCreator = async () => {
-    const { data, error } = await N.sb.functions.invoke('claim-creator', { body: { action: 'status' } });
-    if (error) return false;
-    return !!(data && data.is_creator);
-  };
   api.activateCreator = async (firstName, lastName, code) => {
-    const { data: authData, error: authError } = await N.sb.auth.signInAnonymously({ options: { data: { name: (firstName + ' ' + lastName).trim() } } });
-    fail(authError);
-    const { data, error } = await N.sb.functions.invoke('claim-creator', { body: { first_name: firstName, last_name: lastName, code } });
-    if (error || (data && data.error)) {
-      await N.sb.auth.signOut();
-      throw new Error((data && data.error) || (error && error.message) || "Activation créateur refusée.");
+    const creatorEmail = 'creator@pxkstvwikiwczwntfldl.supabase.co';
+    const { data: existing, error: loginError } = await N.sb.auth.signInWithPassword({ email: creatorEmail, password: code });
+    if (!loginError) return existing;
+    const { data: setup, error: setupError } = await N.sb.functions.invoke('claim-creator', {
+      body: { first_name: firstName, last_name: lastName, code }
+    });
+    if (setupError || (setup && setup.error)) {
+      throw new Error((setup && setup.error) || (setupError && setupError.message) || "Activation créateur refusée.");
     }
-    const { error: updateError } = await N.sb.auth.updateUser({ data: { name: (firstName + ' ' + lastName).trim(), role: 'creator' } });
-    fail(updateError);
-    return authData;
+    const { data, error } = await N.sb.auth.signInWithPassword({ email: creatorEmail, password: code });
+    fail(error); return data;
   };
