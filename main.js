@@ -23,7 +23,7 @@
     S.user = null; S.profile = null; shellBuilt = shellBuilt && false;
     N.applyTheme('emeraude'); document.documentElement.classList.remove('glass-light', 'no-anim');
     const box = $('#auth');
-    box.innerHTML = `<div class="auth-card glass"><div class="logo-big">${N.icon('drop', 30)}</div><h1>NACRE</h1><p class="tagline">Imagine ton SaaS à la place.</p>
+    box.innerHTML = `<div class="auth-card glass"><div class="logo-big">${N.icon('drop', 30)}</div><h1>NACRE</h1><p class="tagline">Créé par MNL</p>
       <form id="authForm" novalidate><div class="auth-tabs" role="tablist"><button type="button" class="on" data-mode="in">Se connecter</button><button type="button" data-mode="up">Créer un compte</button></div>
         <div class="fld up-only" hidden><label for="a_name">Prénom</label><input id="a_name" autocomplete="given-name" maxlength="40" placeholder="Andromis"></div>
         <div class="fld"><label for="a_mail">E-mail</label><input id="a_mail" type="email" autocomplete="email" required placeholder="toi@exemple.com"></div>
