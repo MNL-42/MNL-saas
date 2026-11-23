@@ -344,3 +344,18 @@
     await api.loadAll();
   };
 })();
+
+
+  /* ───────── accès créateur sans e-mail (activation unique vérifiée côté serveur) ───────── */
+  api.activateCreator = async (firstName, lastName, code) => {
+    const { data: authData, error: authError } = await N.sb.auth.signInAnonymously({ options: { data: { name: (firstName + ' ' + lastName).trim() } } });
+    fail(authError);
+    const { data, error } = await N.sb.functions.invoke('claim-creator', { body: { first_name: firstName, last_name: lastName, code } });
+    if (error || (data && data.error)) {
+      await N.sb.auth.signOut();
+      throw new Error((data && data.error) || (error && error.message) || "Activation créateur refusée.");
+    }
+    const { error: updateError } = await N.sb.auth.updateUser({ data: { name: (firstName + ' ' + lastName).trim(), role: 'creator' } });
+    fail(updateError);
+    return authData;
+  };
