@@ -18,6 +18,10 @@
   /* ───────── authentification ───────── */
   api.getSession = async () => { const { data, error } = await N.sb.auth.getSession(); fail(error); return data.session; };
   api.onAuth = (cb) => N.sb.auth.onAuthStateChange((ev, sess) => cb(ev, sess));
+  api.signInAnonymous = async (identity) => {
+    const { data, error } = await N.sb.auth.signInAnonymously({ options: { data: identity } });
+    fail(error); return data;
+  };
   api.signIn = async (email, password) => { const { data, error } = await N.sb.auth.signInWithPassword({ email, password }); fail(error); return data; };
   api.signUp = async (email, password, name) => {
     const { data, error } = await N.sb.auth.signUp({ email, password, options: { data: { name }, emailRedirectTo: location.origin + location.pathname } });
@@ -35,7 +39,8 @@
     if (!data) {
       let tz = 'Europe/Paris';
       try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || tz; } catch (e) { /* ignore */ }
-      const name = (user.user_metadata && user.user_metadata.name) || (user.email || '').split('@')[0] || '';
+      const meta = user.user_metadata || {};
+      const name = [meta.first_name, meta.post_name, meta.last_name].filter(Boolean).join(' ') || meta.name || (user.email || '').split('@')[0] || '';
       const lang = /^fr-(BE|CA|CH)/.test(navigator.language || '') ? navigator.language.slice(0, 5) : 'fr-FR';
       const r = await N.sb.from(T('profiles')).insert({ user_id: user.id, display_name: name, timezone: tz, language: lang }).select().single();
       fail(r.error); data = r.data;
