@@ -151,9 +151,6 @@
     if (entering || !user) return; entering = true;
     S.user = user;
     try {
-      if (user.is_anonymous && !(await N.api.isCreator())) {
-        S.user = null; entering = false; showAuth(); return;
-      }
       await N.api.loadProfile(user); N.applyPrefs();
       await N.api.loadAll();
       let ran = 0; try { ran = await N.api.runAutosave(); } catch (e) { console.warn('autosave', e); }
